@@ -1,0 +1,91 @@
+﻿@model Employees.Models.Employee
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="~/css/responsiveForm.css" rel="stylesheet" />
+    <link href="~/css/responstable.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+
+<h4>Employee</h4>
+<hr />
+<div class="responsiveForm responstable">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label">First Name</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label">Last Name</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmploymentDate" class="control-label">Employment Date</label>
+                <input asp-for="EmploymentDate" class="form-control" />
+                <span asp-validation-for="EmploymentDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rate" class="control-label">Rate</label>
+                <input asp-for="Rate" class="form-control" />
+                <span asp-validation-for="Rate" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="display:none">
+                <label asp-for="CreationDate" class="control-label"></label>
+                <input asp-for="CreationDate" class="form-control" />
+                <span asp-validation-for="CreationDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeeJobs" class="control-label">Job title</label>
+                <select class="js-example-basic-multiple" name="jobs[]" multiple="multiple" style="width:50%">
+                    @foreach (Job i in ViewBag.Jobs)
+                    {
+                        <option value="@i.Id">@i.JobName</option>
+                    }
+                </select>
+                
+            </div>
+
+                <div>
+                    <div style="float:left; display:inline-block; margin-right: 5%">
+                        @*<a asp-action="Index">Back</a>*@
+                        <button type="button" onclick="location.href='@Url.Action("Index")'">
+                            Back
+                        </button>
+                    </div>
+                    <div style="display:inline-block" class="form-group">
+                        <input type="submit" value="Save" class="btn btn-default" />
+                    </div>
+                </div>
+
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+    <script>
+        $(document).ready(function () {
+            $('.js-example-basic-multiple').select2();
+        });
+    </script>
+</body>
+</html>

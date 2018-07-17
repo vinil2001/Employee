@@ -5,33 +5,72 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Employees.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Controllers
 {
     public class HomeController : Controller
     {
+        private Context db;
+        public HomeController(Context context)
+        {
+            db = context;
+        }
         public IActionResult Index()
         {
-            return View();
+            var result = db.Employees.Include(a => a.EmployeeJobs).ThenInclude(i => i.Job);
+            
+            return View(result);
         }
 
-        public IActionResult About()
+       public IActionResult Create()
         {
-            ViewData["Message"] = "Your application description page.";
-
+            ViewBag.Jobs = db.Jobs;
             return View();
         }
-
-        public IActionResult Contact()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Employee employee, int[] jobs)
         {
-            ViewData["Message"] = "Your contact page.";
+            foreach (var item in jobs)
+            {
+                //var job = db.Jobs.Find(item);
+                //db.EmployeeJobs.Add(new EmployeeJob() { Employee = employee, Job = job });
 
-            return View();
+                db.EmployeeJobs.Add(new EmployeeJob() { Employee = employee, JobId = item });
+            }
+            employee.CreationDate = DateTime.Now;
+
+            db.Add(employee);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var employee = await db.Employees
+                .SingleOrDefaultAsync(m => m.Id == id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return View(employee);
         }
 
-        public IActionResult Error()
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var employee = await db.Employees.SingleOrDefaultAsync(m => m.Id == id);
+            db.Employees.Remove(employee);
+            await db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
